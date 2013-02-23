@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.Polygon;
@@ -29,12 +30,16 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -132,7 +137,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		jf.getContentPane().add(jp);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		jf.setPreferredSize(new Dimension(1200,1000));
+		jf.setPreferredSize(new Dimension(1000,800));
 		jf.pack();
 		jf.setVisible(true);
 
@@ -151,6 +156,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 	public JPanel startFunction(String s){   
 		//Util.g = Util.readGraphFromFile(s);
 		Util.g = Util.readGraphFromContent(s);
+		System.out.println(Util.g);
 		Layout<Vertex,Edge> frl=new FRLayout<Vertex,Edge>(Util.g);
 	
 		Util.vv = new VisualizationViewer<Vertex,Edge>(frl);
@@ -159,7 +165,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		Util.vv.setRenderer(bb);
 		
 		Util.stepX=50; Util.stepY=50;
-		Util.xlines=20;Util.ylines=20;
+		Util.xlines=30;Util.ylines=30;
 
 
 
@@ -186,11 +192,16 @@ public class DsrDraw extends JApplet implements ActionListener{
 					return (e.sgn>0)? new BasicStroke(1): RenderContext.DASHED;}
 				}
 				);
-		Util.vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<Vertex,Edge>());		 
-		//Util.vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
-   
+		//Util.vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.QuadCurve<Vertex,Edge>());		 
+		Util.vv.getRenderContext().setEdgeShapeTransformer(new MultipleEdgeFirstTransformer());		 
+		Util.vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
+		
+		 Util.vv.setEdgeToolTipTransformer(new Transformer<Edge,String>() {
+			 			public String  transform(Edge edge) {
+                             return "E" +edge.id+Util.g.getEndpoints(edge).toString();
+			 			}});
 		JPanel jp = new JPanel();
-		jp.setName("Chimical Reaction Networlk");
+		jp.setName("Chemical Reaction Networlk");
 		jp.setLayout(new BorderLayout());
 
 		Util.vv.setBackground(Color.white);
@@ -200,9 +211,9 @@ public class DsrDraw extends JApplet implements ActionListener{
 		title.setPreferredSize(new Dimension(100, 5));
 		title.setForeground(Color.WHITE);
 		JLabel title_label=new JLabel("Chemical Reaction Network");
-		title_label.setForeground(Color.WHITE);
+		title_label.setForeground(Color.RED);
 		title.add(title_label);
-	//	jp.add(title, BorderLayout.NORTH);
+		//jp.add(title, BorderLayout.NORTH);
 		jp.add(scrollPane);
 		
 		jp.setBorder(BorderFactory.createCompoundBorder( BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
@@ -228,91 +239,68 @@ public class DsrDraw extends JApplet implements ActionListener{
 	protected void addBottomControls(final JPanel jp) 
 	{
 		final JPanel control_panel = new JPanel();
-		jp.add(control_panel, BorderLayout.EAST);
-		control_panel.setLayout(new BorderLayout());
-		final Box vertex_panel = Box.createVerticalBox();
-		vertex_panel.setBorder(BorderFactory.createTitledBorder("Species"));
-		final Box edge_panel = Box.createVerticalBox();
-		edge_panel.setBorder(BorderFactory.createTitledBorder("Edges"));
-		final Box both_panel = Box.createVerticalBox();
+		jp.add(control_panel, BorderLayout.NORTH);
+		//control_panel.setBackground(Color.DARK_GRAY);
+		control_panel.setLayout(new BoxLayout(control_panel, BoxLayout.LINE_AXIS));   //differnt
+		final Box vertex_panel = Box.createHorizontalBox();
+		vertex_panel.setBorder(BorderFactory.createTitledBorder("Weight"));
+		JPanel shape_panel = new JPanel();
+		shape_panel.setLayout(new BoxLayout(shape_panel, BoxLayout.LINE_AXIS));
+		shape_panel.setBorder(BorderFactory.createTitledBorder("Edge shape"));
+	
+		JPanel zoomPanel = new JPanel();
+		zoomPanel.setLayout(new BoxLayout(zoomPanel, BoxLayout.LINE_AXIS));
+		zoomPanel.setBorder(BorderFactory.createTitledBorder("Zoom"));
 
-		control_panel.add(vertex_panel, BorderLayout.NORTH);
-		control_panel.add(edge_panel, BorderLayout.SOUTH);
-		control_panel.add(both_panel, BorderLayout.CENTER);
+		JPanel gridPanel = new JPanel();
+		gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.LINE_AXIS));
+		gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
+ 
+		JLabel intro=new JLabel(" CRN ", JLabel.CENTER);
+		intro.setForeground(new Color(49,101,223));
+		intro.setFont(new Font("Bookman", Font.BOLD,18));
+		control_panel.add(intro);
+		//control_panel.add(new JSeparator(SwingConstants.VERTICAL));
+		//control_panel.add(new JSeparator(SwingConstants.VERTICAL));
+				
+		
+		control_panel.add(vertex_panel);
+		control_panel.add(shape_panel);
+		control_panel.add(zoomPanel);
+		control_panel.add(gridPanel);
+		
 
 
-		abc_names = new JCheckBox("ABC name for species");
-		abc_names.addActionListener(this);
-		vertex_panel.add(abc_names);
+		//abc_names = new JCheckBox("ABC");
+		//abc_names.addActionListener(this);
+		e_labels = new JCheckBox("show edge weight values");
+		e_labels.setSelected(true);
+		e_labels.addActionListener(this);
+		vertex_panel.add(e_labels);
+
 		// set up edge controls
 
-	/*	JPanel gradient_panel = new JPanel(new GridLayout(1, 0));
-		gradient_panel.setBorder(BorderFactory.createTitledBorder("Edge paint"));
-		no_gradient = new JRadioButton("Solid color");
-		no_gradient.addActionListener(this);
-		no_gradient.setSelected(true);
-		//		gradient_absolute = new JRadioButton("Absolute gradient");
-		//		gradient_absolute.addActionListener(this);
-		gradient_relative = new JRadioButton("Gradient");
-		gradient_relative.addActionListener(this);
-		ButtonGroup bg_grad = new ButtonGroup();
-		bg_grad.add(no_gradient);
-		bg_grad.add(gradient_relative);
-		//bg_grad.add(gradient_absolute);
-		gradient_panel.add(no_gradient);
-		//gradientGrid.add(gradient_absolute);
-		gradient_panel.add(gradient_relative);
-*/
-		JPanel shape_panel = new JPanel(new GridLayout(3,2));
-		shape_panel.setBorder(BorderFactory.createTitledBorder("Edge shape"));
 		e_line = new JRadioButton("line");
 		e_line.addActionListener(this);
 		e_line.setSelected(true);
-		//        e_bent = new JRadioButton("bent line");
-		//        e_bent.addActionListener(this);
-	//	e_wedge = new JRadioButton("wedge");
-		//e_wedge.addActionListener(this);
-		e_quad = new JRadioButton("quad curve");
+		e_quad = new JRadioButton("quad");
 		e_quad.addActionListener(this);
-		e_cubic = new JRadioButton("cubic curve");
+		e_cubic = new JRadioButton("cubic");
 		e_cubic.addActionListener(this);
-//		e_ortho = new JRadioButton("orthogonal");
-//		e_ortho.addActionListener(this);
+
 		ButtonGroup bg_shape = new ButtonGroup();
 		bg_shape.add(e_line);
-		//        bg.add(e_bent);
-//		bg_shape.add(e_wedge);
 		bg_shape.add(e_quad);
-	//	bg_shape.add(e_ortho);
 		bg_shape.add(e_cubic);
+	
 		shape_panel.add(e_line);
-		//        shape_panel.add(e_bent);
-		//shape_panel.add(e_wedge);
 		shape_panel.add(e_quad);
 		shape_panel.add(e_cubic);
-		//shape_panel.add(e_ortho);
-		//fill_edges = new JCheckBox("fill edge shapes");
-		//fill_edges.setSelected(false);
-		//fill_edges.addActionListener(this);
-		//shape_panel.add(fill_edges);
 		shape_panel.setOpaque(true);
-		// e_color = new JCheckBox("highlight edge weights");
-		// e_color.addActionListener(this);
-		e_labels = new JCheckBox("show edge weight values");
-		e_labels.addActionListener(this);
+		
 
-
-		shape_panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		edge_panel.add(shape_panel);
-		//gradient_panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		//edge_panel.add(gradient_panel);
-
-
-		e_labels.setAlignmentX(Component.LEFT_ALIGNMENT);
-		edge_panel.add(e_labels);
-
-		// set up zoom controls
-		zoom_at_mouse = new JCheckBox("<html><center>zoom at mouse<p>(wheel only)</center></html>");
+		
+		zoom_at_mouse = new JCheckBox("<html><center>zoom at (wheel) mouse<p></center></html>");
 		zoom_at_mouse.addActionListener(this);
 		zoom_at_mouse.setSelected(true);
 
@@ -333,13 +321,8 @@ public class DsrDraw extends JApplet implements ActionListener{
 			}
 		});
 
-		JPanel zoomPanel = new JPanel();
-		zoomPanel.setBorder(BorderFactory.createTitledBorder("Zoom"));
-		plus.setAlignmentX(Component.CENTER_ALIGNMENT);
 		zoomPanel.add(plus);
-		minus.setAlignmentX(Component.CENTER_ALIGNMENT);
 		zoomPanel.add(minus);
-		zoom_at_mouse.setAlignmentX(Component.CENTER_ALIGNMENT);
 		zoomPanel.add(zoom_at_mouse);
 
 		//Grid buttons
@@ -351,7 +334,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		JButton plus_grid = new JButton("+");
 		plus_grid.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Util.stepX+=10;Util.stepY+=10; 
+				Util.stepX+=10;Util.stepY+=10;
 				Util.xlines=Util.vv.getWidth()/(Util.stepX+1)+1;
 				Util.ylines=Util.vv.getHeight()/(Util.stepY+1)+1;
 				Util.vv.repaint();
@@ -368,27 +351,18 @@ public class DsrDraw extends JApplet implements ActionListener{
 				Util.vv.repaint();}
 			}
 		});
-		JPanel gridPanel = new JPanel();
-		gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
-		plus_grid.setAlignmentX(Component.CENTER_ALIGNMENT);
 		gridPanel.add(plus_grid);
-		minus_grid.setAlignmentX(Component.CENTER_ALIGNMENT);
 		gridPanel.add(minus_grid);
-		set_grid.setAlignmentX(Component.CENTER_ALIGNMENT);
 		gridPanel.add(set_grid);
 		snap_to_grid = new JCheckBox("<html><center>Snap to grid</center></html>");
 		snap_to_grid.addActionListener(this);
 		snap_to_grid.setSelected(false);
-		snap_to_grid.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 		gridPanel.add(snap_to_grid);
 
 		JPanel fontPanel = new JPanel();
 		// add font and zoom controls to center panel
 
-		both_panel.add(zoomPanel);
-		both_panel.add(gridPanel);
-		both_panel.add(fontPanel);
-
+		
 		Util.modeBox = gm.getModeComboBox();
 		Util.modeBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){

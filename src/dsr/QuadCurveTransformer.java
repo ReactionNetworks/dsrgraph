@@ -51,6 +51,8 @@ public Point2D affineTransform(Edge edge, Point2D p){
 }
 public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 	Layout<Vertex,Edge> layout = v.getModel().getGraphLayout();
+	Graph<Vertex,Edge> graph = context.graph;
+    
     QuadCurve2D old=new QuadCurve2D.Float();
 	//CubicCurve2D old=new CubicCurve2D.Float();//=(CubicCurve2D)super.transform(context);
 	//	CubicCurve2D old=(CubicCurve2D)super.transform(context);
@@ -74,30 +76,33 @@ public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 		Point2D currCtrl3 = new Point2D.Double();
 		//Point2D currCtrl2 = new Point2D.Double();
 		currCtrl3=affineTransform(edge, edge.ctrl3);
-		//currCtrl2=affineTransform(edge, edge.ctrl2);
-		System.out.println("sfsdgsdfg"+Util.modeBox.getSelectedIndex());
 		if(((Util.ctrl3.getEdge().equals(edge)) & 
 				(!(Util.vv.getPickedVertexState().getPicked().contains(Util.ctrl3))
 						) //here the shape of the edge should not be changed
-				//!(Util.vv.getPickedVertexState().getPicked().contains(Util.ctrl2))
 				))
 			//the edge is selected, but it is not changed by the control nodes
 			//the control nodes position is changed
-		{layout.setLocation(Util.ctrl3,  currCtrl3); System.out.println("ADAsdasdas");
-		//layout.setLocation(Util.ctrl2, currCtrl2);}
+		{layout.setLocation(Util.ctrl3,  currCtrl3);
 		}  
 	}}
-
-
-
-
 	if (edge.edited)
 	{old.setCurve(0.0,0.0, edge.ctrl3.getX(), edge.ctrl3.getY(), 1.0,0.0);
-		//old.setCurve(0.0f, 0.0f, edge.ctrl1.getX(),edge.ctrl1.getY(),edge.ctrl2.getX(), edge.ctrl2.getY(), 1.0f,0.0f);
-	return old;
+		return old;
 	}
 	else
-		return new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
+		if(edge.isMultiple)
+		{ 
+		int index=1; 
+		if(parallelEdgeIndexFunction != null) 
+				        index = parallelEdgeIndexFunction.getIndex(graph, edge);
+		edge.ctrl3.setLocation(edge.ctrl3.getX(), 20f+20f*index);    
+		
+			old.setCurve(0.0,0.0, edge.ctrl3.getX(), edge.ctrl3.getY(), 1.0,0.0);
+			return old;
+		
+		}
+        else
+		 return new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
 	//}
 	//else 
 	//	old.setCurve(0.0f, 0.0f, edge.ctrl1.getX(),edge.ctrl1.getY(),edge.ctrl2.getX(), edge.ctrl2.getY(), 1.0f,0.0f);
