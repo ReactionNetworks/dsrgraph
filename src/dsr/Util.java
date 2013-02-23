@@ -106,7 +106,7 @@ public class Util {
 							else //m1<>0 m2<>0 m2<>nothing m1.sign<>m2.sign the value of ra is the value of ra????
 							{   
 								graph.addEdge(new Edge((short)(matrix1.get(s)), (int) idFactory.create(),true),  ini, sps.get(s), EdgeType.DIRECTED );
-								graph.addEdge(new Edge((short)(matrix1.get(s)), (int) idFactory.create(),true),  sps.get(s), ini, EdgeType.DIRECTED );
+								graph.addEdge(new Edge((short)(matrix2.get(s)), (int) idFactory.create(),true),  sps.get(s), ini, EdgeType.DIRECTED );
 								
 							}
 					}
