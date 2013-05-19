@@ -28,6 +28,8 @@ public class Edge {
 	   this.lbl=(short) (sgn*value);
 	   //this.lbl=value;
 	   orientation=1;this.id=id;
+	   if (this.lbl!=1)
+		   Util.allOne=false;
 	   
    }
    public Edge(short value, int id, boolean multiple){
@@ -50,13 +52,22 @@ public class Edge {
 	   return id;
    }
    public String toString(){
+	  if (Util.toLatex)
+		  if (lbl!=1)
+			   if (lbl==100)
+				   return "$\\infty$";
+			   else
+			       return ""+lbl;
+		   else
+			    return (Util.allOne)? "":""+lbl ;
+		  
 	   if (lbl!=1)
 		   if (lbl==100)
 			   return "<html>&#8734;</html>";
 		   else
 		       return "<html>"+lbl+"</html>";
 	   else
-		    return "";
+		    return (Util.allOne)? "":"<html>"+lbl+"</html>" ;
    }
 
 }

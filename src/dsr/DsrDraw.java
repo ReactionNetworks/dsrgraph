@@ -12,6 +12,7 @@ import java.awt.Paint;
 import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.Shape;
+import java.awt.GradientPaint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -23,7 +24,10 @@ import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +41,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import javax.swing.JLabel;
@@ -72,14 +78,16 @@ import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
+import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.GradientEdgePaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
+import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
-
+import edu.uci.ics.jung.visualization.renderers.BasicVertexLabelRenderer.InsidePositioner;
 
 public class DsrDraw extends JApplet implements ActionListener{
 	static VertexShapeSizeAspect<Vertex> vsta;
@@ -108,19 +116,19 @@ public class DsrDraw extends JApplet implements ActionListener{
 	protected JCheckBox snap_to_grid;
 	protected JCheckBox fill_edges;
 	protected JCheckBox abc_names;
+	protected JTextArea latex;
 
 	protected JRadioButton no_gradient;
 	//		protected JRadioButton gradient_absolute;
 	protected JRadioButton gradient_relative;
-
+	JButton coordB; 
 	protected static final int GRADIENT_NONE = 0;
 	protected static final int GRADIENT_RELATIVE = 1;
 	//		protected static final int GRADIENT_ABSOLUTE = 2;
 	protected static int gradient_level = GRADIENT_NONE;
 
 	protected DefaultModalGraphMouse<Vertex,Edge> gm;
-	protected GradientPickedEdgePaintFunction edgeDrawPaint;
-	protected GradientPickedEdgePaintFunction edgeFillPaint;
+
 	protected SnapToGridStaticLayout snapToGridLayout;
 	protected NoSnapToGridStaticLayout nosnapToGridLayout;
 	protected CubicCurveTransformer cubicTransf;
@@ -137,7 +145,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		jf.getContentPane().add(jp);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		jf.setPreferredSize(new Dimension(1000,800));
+		jf.setPreferredSize(new Dimension(1000,700));
 		jf.pack();
 		jf.setVisible(true);
 
@@ -146,15 +154,17 @@ public class DsrDraw extends JApplet implements ActionListener{
 		// WindowUtilities.setNativeLookAndFeel();
 		Container content = getContentPane();
 		content.setBackground(Color.LIGHT_GRAY);
-		resize(1000,800);
-		content.setPreferredSize(new Dimension(1000,1000));
+		resize(1000,700);
+		content.setPreferredSize(new Dimension(1000,700));
 		JPanel jp=new DsrDraw().startFunction(getParameter("content"));
+		
 		content.add(jp);
 		
 	}
 	//create a grid layout
 	public JPanel startFunction(String s){   
 		//Util.g = Util.readGraphFromFile(s);
+		
 		Util.g = Util.readGraphFromContent(s);
 		System.out.println(Util.g);
 		Layout<Vertex,Edge> frl=new FRLayout<Vertex,Edge>(Util.g);
@@ -175,18 +185,29 @@ public class DsrDraw extends JApplet implements ActionListener{
 		nosnapToGridLayout=new NoSnapToGridStaticLayout(Util.g);//,Util.vv.getGraphLayout());
 		cubicTransf=new CubicCurveTransformer(Util.vv);
 		quadTransf=new QuadCurveTransformer(Util.vv);
-		Util.vv.getRenderContext().setVertexDrawPaintTransformer(new ControlPickableVertexPaintTransformer(Util.vv.getPickedVertexState(),Color.GRAY, Color.RED));
+		 Util.vv.getRenderer().setVertexRenderer(
+                 new GradientVertexRenderer<Vertex,Edge>(
+                                 new Color(200,170,170), new Color(250,230,230), 
+                                 Color.red, Color.red,
+                                 Util.vv.getPickedVertexState(),
+                                 false));
+
+		Util.vv.getRenderContext().setVertexDrawPaintTransformer(new ControlPickableVertexPaintTransformer(Util.vv.getPickedVertexState(),Color.RED, Color.WHITE));
 		Util.vv.getRenderContext().setVertexShapeTransformer(vsta);
 		Util.vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
+		Util.vv.getRenderContext().setVertexFontTransformer(new ConstantTransformer( new Font("Helvetica", Font.BOLD,12)));
+		Util.vv.getRenderContext().getEdgeLabelRenderer().setRotateEdgeLabels(false);
 		Util.vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<Vertex>());
-		Util.vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<Vertex,Paint>(){
+		 Util.vv.getRenderContext().setLabelOffset(2);
+		
+	/*	Util.vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<Vertex,Paint>(){
 			public Paint transform(Vertex v){
 				if (v instanceof ControlPoint)
 					return Color.green;
-				else return Color.WHITE;
+				else return new GradientPaint(0,0,Color.LIGHT_GRAY,30, 0,Color.RED); 
 			}
 		});
-
+*/
 		Util.vv.getRenderContext().setEdgeStrokeTransformer(new Transformer<Edge,Stroke>()
 				{ public Stroke transform(Edge e){
 					return (e.sgn>0)? new BasicStroke(1): RenderContext.DASHED;}
@@ -210,7 +231,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		title.setBackground(Color.GRAY);
 		title.setPreferredSize(new Dimension(100, 5));
 		title.setForeground(Color.WHITE);
-		JLabel title_label=new JLabel("Chemical Reaction Network");
+		JLabel title_label=new JLabel("CoNtRoL - Chemical Reaction Network");
 		title_label.setForeground(Color.RED);
 		title.add(title_label);
 		//jp.add(title, BorderLayout.NORTH);
@@ -223,14 +244,13 @@ public class DsrDraw extends JApplet implements ActionListener{
        
         gm.setMode(Mode.PICKING);
       
-		addBottomControls( jp );
-
-		Util.ctrl1= new ControlPoint((byte) 1);
+		addBottomControls( jp );Util.ctrl1= new ControlPoint((byte) 1);
 		Util.ctrl2=new ControlPoint((byte) 2);
 		Util.ctrl3=new ControlPoint((byte) 3);
 		Util.g.addVertex(Util.ctrl1);
 		Util.g.addVertex(Util.ctrl2);
 		Util.g.addVertex(Util.ctrl3);
+		
 		return jp;
 	}
 
@@ -256,7 +276,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.LINE_AXIS));
 		gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
  
-		JLabel intro=new JLabel(" CRN ", JLabel.CENTER);
+		JLabel intro=new JLabel("CoNtRoL", JLabel.CENTER);
 		intro.setForeground(new Color(49,101,223));
 		intro.setFont(new Font("Bookman", Font.BOLD,18));
 		control_panel.add(intro);
@@ -268,15 +288,14 @@ public class DsrDraw extends JApplet implements ActionListener{
 		control_panel.add(shape_panel);
 		control_panel.add(zoomPanel);
 		control_panel.add(gridPanel);
-		
-
+	
 
 		//abc_names = new JCheckBox("ABC");
 		//abc_names.addActionListener(this);
 		e_labels = new JCheckBox("show edge weight values");
 		e_labels.setSelected(true);
 		e_labels.addActionListener(this);
-		vertex_panel.add(e_labels);
+	//	vertex_panel.add(e_labels);
 
 		// set up edge controls
 
@@ -300,9 +319,9 @@ public class DsrDraw extends JApplet implements ActionListener{
 		
 
 		
-		zoom_at_mouse = new JCheckBox("<html><center>zoom at (wheel) mouse<p></center></html>");
-		zoom_at_mouse.addActionListener(this);
-		zoom_at_mouse.setSelected(true);
+	//	zoom_at_mouse = new JCheckBox("<html><center>zoom at (wheel) mouse<p></center></html>");
+		//zoom_at_mouse.addActionListener(this);
+		//zoom_at_mouse.setSelected(true);
 
 		final ScalingControl scaler = new CrossoverScalingControl();
 
@@ -323,7 +342,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 
 		zoomPanel.add(plus);
 		zoomPanel.add(minus);
-		zoomPanel.add(zoom_at_mouse);
+		//zoomPanel.add(zoom_at_mouse);
 
 		//Grid buttons
 		set_grid = new JCheckBox("<html><center>Show grid</center></html>");
@@ -359,31 +378,17 @@ public class DsrDraw extends JApplet implements ActionListener{
 		snap_to_grid.setSelected(false);
 		gridPanel.add(snap_to_grid);
 
-		JPanel fontPanel = new JPanel();
-		// add font and zoom controls to center panel
-
 		
-		Util.modeBox = gm.getModeComboBox();
-		Util.modeBox.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				if (Util.modeBox.getSelectedIndex()==0)
-					Util.vv.getPickedEdgeState().clear();
-				Util.vv.getPickedVertexState().clear();
-			}
-		});
-		Util.modeBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JPanel modePanel = new JPanel(new BorderLayout()) {
-			public Dimension getMaximumSize() {
-				return getPreferredSize();
-			}
-		};
-		modePanel.setBorder(BorderFactory.createTitledBorder("Mouse Mode"));
-		modePanel.add(Util.modeBox);
-		JPanel comboGrid = new JPanel(new GridLayout(0,1));
-		comboGrid.add(modePanel);
-		fontPanel.add(comboGrid);
-
-
+		//modePanel.add(Util.modeBox);
+		coordB=new JButton("ExportToLatex");
+		coordB.addActionListener(this);
+	
+		control_panel.add(coordB);
+		latex = new JTextArea(5, 30);
+		JScrollPane scrollPane = new JScrollPane(latex);
+		latex.setLineWrap(true);
+		latex.setEditable(false);
+		 jp.add(scrollPane, BorderLayout.EAST);
 
 	}
 
@@ -520,15 +525,10 @@ public class DsrDraw extends JApplet implements ActionListener{
 							gradient_level = GRADIENT_RELATIVE;
 						}
 					}
-					else if (source == fill_edges)
-					{
-						if(source.isSelected()) {
-							Util.vv.getRenderContext().setEdgeFillPaintTransformer( edgeFillPaint );
-						} else {
-							Util.vv.getRenderContext().setEdgeFillPaintTransformer( new ConstantTransformer(null) );
-						}
-						//            edgePaint.useFill(source.isSelected());
-					}
+					else
+						if(source==coordB)
+							latex.setText(Util.exportToLatex());
+							
 		Util.vv.repaint();
 	}
 
@@ -562,43 +562,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		}
 
 	}
-	public class GradientPickedEdgePaintFunction extends GradientEdgePaintTransformer<Vertex,Edge> 
-	{
-		private Transformer<Edge,Paint> defaultFunc;
-		protected boolean fill_edge = false;
-		Predicate<Context<Graph<Vertex,Edge>,Edge>> selfLoop = new SelfLoopEdgePredicate<Vertex,Edge>();
-		VisualizationViewer<Vertex,Edge> vv;
-
-		public GradientPickedEdgePaintFunction(Transformer<Edge,Paint> defaultEdgePaintFunction, 
-				VisualizationViewer<Vertex,Edge> vv) 
-		{ 
-			super(Color.YELLOW, Color.BLACK, vv);
-			this.defaultFunc = defaultEdgePaintFunction;
-			this.vv=vv;
-		}
-
-		public void useFill(boolean b)
-		{
-			fill_edge = b;
-		}
-
-		public Paint transform(Edge e) {
-
-			if (gradient_level == GRADIENT_NONE) {
-				return defaultFunc.transform(e);
-			} else {
-				return super.transform(e);
-			}
-		}
-
-		protected Color getColor2(Edge e)
-		{
-			return Util.vv.getPickedEdgeState().isPicked(e)? Color.RED : c2;
-		}
-
-
-
-	}
+	
 
 	class ControlPickableVertexPaintTransformer extends PickableVertexPaintTransformer<Vertex>{
 		//change position of control points - applies only to these points
@@ -664,9 +628,11 @@ public class DsrDraw extends JApplet implements ActionListener{
 			if (!(v instanceof ControlPoint))
 				p.setLocation(Util.stepX*Math.round(p.getX() / Util.stepX) , Util.stepY*(Math.round(p.getY() / Util.stepY)));
 			//   p=Util.vv.getRenderContext().getMultiLayerTransformer().transform(p);
+			
 			return p;
 		}
 	}
+	
 	class NoSnapToGridStaticLayout extends StaticLayout<Vertex, Edge>{
 		public NoSnapToGridStaticLayout(Graph<Vertex, Edge> g){
 			super(g, Util.vv.getGraphLayout());

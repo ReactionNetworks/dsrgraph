@@ -10,6 +10,7 @@ public class Species extends Vertex{
   }
   public Species(String n){
 	  this.n=n;
+	
   }
   
   public String toString(){
@@ -17,7 +18,7 @@ public class Species extends Vertex{
 		  //return Character.toString((char)('A'+no));
 		  return n;
 	  else
-		   return "S"+(no+1);
+		   return ""+(no+1);
 	  
   }
 }

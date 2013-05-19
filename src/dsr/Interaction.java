@@ -2,11 +2,15 @@ package dsr;
 
 public class Interaction extends Vertex{
      short no;
+     static boolean name=true;
      public Interaction(short no){
     	 this.no=no;
      }
      
      public String toString(){
-    	 return "R"+no;
+    	 if (name)
+    		  return "R"+(no+1);
+    	 else 
+    		 return ""+(no+1);
      }
 }
