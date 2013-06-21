@@ -19,7 +19,9 @@ import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape.CubicCurve;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape.Line;
 
-public class MultipleEdgeFirstTransformer extends EdgeShape.QuadCurve<Vertex,Edge>
+//public class MultipleEdgeFirstTransformer extends EdgeShape.QuadCurve<Vertex,Edge>
+public class MultipleEdgeFirstTransformer extends QuadCurveTransformer
+
 {   VisualizationViewer<Vertex,Edge> v;
     EdgeShape.Line<Vertex,Edge> cct;
 
@@ -36,23 +38,25 @@ public MultipleEdgeFirstTransformer(){
 
 
 public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
-    //return cct.transform(context);
+  
     
-  //  int index = 1;
-    //if(parallelEdgeIndexFunction != null) {
-      //  index = parallelEdgeIndexFunction.getIndex(graph, e);
-    //}
-    
+  
 	Edge edge = (Edge)context.element;
-	//Graph<Vertex,Edge> graph = context.graph;
+	Graph<Vertex,Edge> graph = context.graph;
     
-	//System.out.println(cct.getEdgeIndexFunction());
+	
 	if (!edge.isMultiple)
 		{return cct.transform(context);
 		}
 	else
-		{edge.lineType=Util.LineType.quadType; //TODO: add control point;
+		{edge.lineType=Util.LineType.quadType;
+		int index=1; 
+		if(parallelEdgeIndexFunction != null) 
+			index = parallelEdgeIndexFunction.getIndex(graph, edge);
+		super.setVV(Util.vv);
+		edge.ctrl3.setLocation(edge.ctrl3.getX(), 20f+20f* (index==1 ? 0: -2 ));    
 		 return super.transform(context);
+		
 		}
 }
 }

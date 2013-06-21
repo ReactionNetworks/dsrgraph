@@ -1,11 +1,9 @@
 package dsr;
 
-import java.awt.BasicStroke;
+
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +44,7 @@ public class Util {
 	public static VisualizationViewer<Vertex, Edge> vv;
 	public static ControlPoint ctrl1, ctrl2, ctrl3;
 	// public static char modalMouse='p';
-	public static JComboBox modeBox;
+	//public static JComboBox modeBox;
 
 	public static Graph<Vertex, Edge> readGraphFromContent(String content) {
 		Graph<Vertex, Edge> graph = new SparseMultigraph<Vertex, Edge>();
@@ -57,18 +55,8 @@ public class Util {
 				return count++;
 			}
 		};
-		Factory<Short> idNodesFactory = new Factory<Short>() {
-			int count;
-
-			public Short create() {
-				return (short) count++;
-			}
-		};
-
-		// the first matrix
-		List<Map<String, List<Integer>>> m1 = new ArrayList<Map<String, List<Integer>>>();
-		// the second matrix
-
+	
+	
 		// the Vertex for the species
 		Map<String, Species> sps = new HashMap<String, Species>();
 
@@ -177,7 +165,7 @@ public class Util {
 			// }
 			// }
 		}
-		System.out.println(graph);
+		
 		return graph;
 	}
 
@@ -192,7 +180,7 @@ public class Util {
 																	// to
 																	// species
 		List<Map<String, Short>> spCard = new ArrayList<Map<String, Short>>();
-		// System.out.println(species[0][0]);
+	
 		for (int i = 0; i < 2; i++)// left/right part of reaction
 		{
 			Map<String, Short> part = new HashMap<String, Short>();
@@ -202,7 +190,7 @@ public class Util {
 													// species name or also a
 													// parameter
 				short coef = 1;
-				if (csp.matches("[0-9]+[a-zA-Z]+")) {
+				if (csp.matches("[0-9]+[a-zA-Z]+.*")) {
 					String pp[] = csp.split("[a-zA-Z]");
 					csp = csp.substring(pp[0].length());
 					coef = Short.parseShort(pp[0]);
@@ -240,7 +228,7 @@ public class Util {
 				v += 1;// -
 			if (((type == 0) || (type == 1)) & (spCard.get(1).containsKey(s)))
 				v += 2;// +
-			System.out.println(v);
+			
 			switch (v) {
 			case 0:
 				matrix2.put(s, (short) 2);
@@ -256,8 +244,7 @@ public class Util {
 				break; // nothing
 			}
 		}
-		System.out.println(matrix1);
-		System.out.println(matrix2);
+		
 		List<Map<String, Short>> result = new ArrayList<Map<String, Short>>();
 		result.add(matrix1);
 		result.add(matrix2);
@@ -266,6 +253,7 @@ public class Util {
 	}
 
 	static public Point2D affineTransform(Edge edge, Point2D p) {
+		//from scaled relative to endpoints to render
 		Layout<Vertex, Edge> layout = Util.vv.getModel().getGraphLayout();
 
 		Pair<Vertex> endpoints = Util.g.getEndpoints(edge);
@@ -322,7 +310,7 @@ public class Util {
 			}
 		}
 		nodes = nodes.subSequence(0, nodes.length() - 1) + "}";
-		System.out.println(nodes);
+		
 		String edges = "\\def\\edges{";
 		Species.name = false;
 		Interaction.name = false;
@@ -356,7 +344,8 @@ public class Util {
 					cp1 = Util.affineTransform(edge, edge.ctrl1);
 					cp2 = Util.affineTransform(edge, edge.ctrl2);
 				} else {
-					Point2D cp = Util.affineTransform(edge, edge.ctrl3);
+					
+					
 					double cp1x, cp2x, cp1y, cp2y;
 					cp1x = 0.66 * edge.ctrl3.getX();
 					cp1y = 0.66 * edge.ctrl3.getY();
@@ -374,9 +363,8 @@ public class Util {
 			}
 
 		}
-		edges = edges.subSequence(0, edges.length() - 1) + "}";// sterge,
-		System.out.println(edges);
-        
+		edges = edges.subSequence(0, edges.length() - 1) + "}";
+		
 		Species.name = true;
 		Interaction.name = true;
 		toLatex=false;
@@ -384,18 +372,7 @@ public class Util {
 	}
 	
 	private static String getFirstPart(){
-		return "% \n" +
-				"% Latex code for DSR drawer \n"+
-				"% \n"+
-				"% Generates tikz output for a DSR graph \n"+
-				"% out of coordinates from CoNtRol\n" +
-				"% \n"+
-				"% authors  Anca Marginean and Casian Pantea \n"+
-				"% \n"+
-                "\n"+
-                "\n"+
-                "\n"+
-                "\\documentclass[12pt]{article} \n"+
+		return  "\\documentclass[12pt]{article} \n"+
 				"\\usepackage{amssymb, amsmath} \n"+
 				"\\usepackage{tikz} \n"+
 				"\\usetikzlibrary{matrix,arrows} \n"+
@@ -404,15 +381,15 @@ public class Util {
 	}
 	private static String getLastPart(){
 		return "\\begin{tikzpicture} \n"+
-		"[scale=.5, %change to default=1 \n"+
+		"[scale=.5,  \n"+
 		"font=\\small, \n"+
 		"reaction/.style={rectangle, minimum size=5mm, inner sep=2pt,  draw=red!50!black!50, solid, top color=red!20!black!10, \n"+
 		"bottom color=red!50!black!20,font=\\small}, \n"+
 		"species/.style={rectangle,draw=white!5,fill=white!9,thick,inner sep=0pt,minimum size=3mm, font=\\small}, \n"+
-		"arcDS/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick, ->}, 		 %Directed Solid \n"+
-		"arcDD/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick, ->, dashed},   %Directed Dashed \n"+
-		"arcUS/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick}, 			 %Undirected Solid \n"+
-		"arcUD/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick, dashed} 	 %Undirected Dashed \n"+
+		"arcDS/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick, ->}, 		\n"+
+		"arcDD/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick, ->, dashed},    \n"+
+		"arcUS/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick}, 			 \n"+
+		"arcUD/.style={shorten <=2pt,shorten >=2pt, >=stealth',semithick, dashed} 	 \n"+
 		"] \n"+
 		"\n"+  
 		"\\newcounter{j} \n"+

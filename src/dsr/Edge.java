@@ -59,7 +59,8 @@ public class Edge {
 			   else
 			       return ""+lbl;
 		   else
-			    return (Util.allOne)? "":""+lbl ;
+			   return "{}";
+			 //   return (Util.allOne)? "":""+lbl ;
 		  
 	   if (lbl!=1)
 		   if (lbl==100)
@@ -67,7 +68,8 @@ public class Edge {
 		   else
 		       return "<html>"+lbl+"</html>";
 	   else
-		    return (Util.allOne)? "":"<html>"+lbl+"</html>" ;
+		   return "";
+		 //   return (Util.allOne)? "":"<html>"+lbl+"</html>" ;
    }
 
 }

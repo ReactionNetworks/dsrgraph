@@ -9,7 +9,7 @@ public class Interaction extends Vertex{
      
      public String toString(){
     	 if (name)
-    		  return "R"+(no+1);
+    		  return ""+(no+1);
     	 else 
     		 return ""+(no+1);
      }

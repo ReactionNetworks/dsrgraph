@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
@@ -51,7 +52,7 @@ public Point2D affineTransform(Edge edge, Point2D p){
 public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 	Layout<Vertex,Edge> layout = v.getModel().getGraphLayout();
 	
-	CubicCurve2D old=new CubicCurve2D.Float();//=(CubicCurve2D)super.transform(context);
+	CubicCurve2D old=new CubicCurve2D.Float();
 	//	CubicCurve2D old=(CubicCurve2D)super.transform(context);
 	Edge edge = (Edge)context.element;
 	
@@ -86,13 +87,19 @@ public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 
 
 
-
-	if (edge.edited)
-	{old.setCurve(0.0f, 0.0f, edge.ctrl1.getX(),edge.ctrl1.getY(),edge.ctrl2.getX(), edge.ctrl2.getY(), 1.0f,0.0f);
-	 
-	return old;
-	}
+	//(edge.edited) &&
+	if (edge.lineType.equals(Util.LineType.cubicType))
+	
+	 {old.setCurve(0.0f, 0.0f, edge.ctrl1.getX(),edge.ctrl1.getY(),edge.ctrl2.getX(), edge.ctrl2.getY(), 1.0f,0.0f);
+	 	return old;
+	 }
 	else
+		if(edge.lineType.equals(Util.LineType.quadType))
+			{QuadCurve2D oldq=new QuadCurve2D.Float();
+			oldq.setCurve(0.0,0.0, edge.ctrl3.getX(), edge.ctrl3.getY(), 1.0,0.0);
+			return oldq;
+			}
+		else	
 		return new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
 	//}
 	//else 
