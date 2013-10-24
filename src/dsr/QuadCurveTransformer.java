@@ -41,7 +41,7 @@ public QuadCurveTransformer(VisualizationViewer<Vertex,Edge> v){
 public Point2D affineTransform(Edge edge, Point2D p){
 	//transforms from 0 - 1 to real position
 	
-	//the problem is that translation is applied i think only in multilayer
+	
 	Layout<Vertex,Edge> layout = v.getModel().getGraphLayout();
 
 	Pair<Vertex> endpoints=Util.g.getEndpoints(edge);
@@ -94,10 +94,9 @@ public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 		Point2D currCtrl3 = new Point2D.Double();
 		currCtrl3=affineTransform(edge, edge.ctrl3);
 		if(((Util.ctrl3.getEdge().equals(edge)) & (!(Util.vv.getPickedVertexState().getPicked().contains(Util.ctrl3))) 
-						//here the shape of the edge should not be changed
+						
 				))
-			//the edge is selected, but it is not changed by the control nodes
-			//the control nodes position is changed
+			
 		{layout.setLocation(Util.ctrl3,  currCtrl3);
 		}  
 	}}

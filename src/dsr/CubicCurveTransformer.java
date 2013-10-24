@@ -53,7 +53,7 @@ public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 	Layout<Vertex,Edge> layout = v.getModel().getGraphLayout();
 	
 	CubicCurve2D old=new CubicCurve2D.Float();
-	//	CubicCurve2D old=(CubicCurve2D)super.transform(context);
+	
 	Edge edge = (Edge)context.element;
 	
 	if(Util.vv.getPickedEdgeState().getPicked().contains(edge)) 
@@ -84,11 +84,7 @@ public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 		layout.setLocation(Util.ctrl2, currCtrl2);}
 
 	}}
-
-
-
-	//(edge.edited) &&
-	if (edge.lineType.equals(Util.LineType.cubicType))
+   if (edge.lineType.equals(Util.LineType.cubicType))
 	
 	 {old.setCurve(0.0f, 0.0f, edge.ctrl1.getX(),edge.ctrl1.getY(),edge.ctrl2.getX(), edge.ctrl2.getY(), 1.0f,0.0f);
 	 	return old;
@@ -101,13 +97,7 @@ public Shape transform(Context<Graph<Vertex,Edge>,Edge> context){
 			}
 		else	
 		return new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
-	//}
-	//else 
-	//	old.setCurve(0.0f, 0.0f, edge.ctrl1.getX(),edge.ctrl1.getY(),edge.ctrl2.getX(), edge.ctrl2.getY(), 1.0f,0.0f);
-
-
-	//return new 
-
+	
 }
 
 }

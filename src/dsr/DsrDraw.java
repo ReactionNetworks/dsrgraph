@@ -31,12 +31,18 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButtonMenuItem;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -93,7 +99,7 @@ import edu.uci.ics.jung.visualization.util.DefaultChangeEventSupport;
 
 public class DsrDraw extends JApplet implements ActionListener{
 	/**
-	 * 
+	 * The main class - GUI components
 	 */
 	private static final long serialVersionUID = 1L;
 	static VertexShapeSizeAspect<Vertex> vsta;
@@ -143,7 +149,10 @@ public class DsrDraw extends JApplet implements ActionListener{
 	boolean startEditing=false;
 	public int grid_stepX, grid_stepY;
 	boolean cubicType=false;
-
+	//static Icon lineI = new ImageIcon("/home/anca/Desktop/img/line.gif");
+	//static Icon oneI = new ImageIcon("/home/anca/Desktop/img/onep.gif");
+	//static Icon twoI = new ImageIcon("/home/anca/Desktop/img/twop.gif");
+	
 	public static void main(String[] args) throws IOException 
 	{
 		JFrame jf = new JFrame();
@@ -157,31 +166,21 @@ public class DsrDraw extends JApplet implements ActionListener{
 
 	}  
 	public void init(){
-		/*try
-		{
-		  //Tell the UIManager to use the platform look and feel
-		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch(Exception e)
-		{
-		  //Do nothing
-		}
-*/
-		Container content = getContentPane();
-		content.setBackground(Color.LIGHT_GRAY);
-		resize(1000,700);
-		content.setPreferredSize(new Dimension(1000,700));
+		JFrame frame=new JFrame("Control Reaction Network");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel jp=new DsrDraw().startFunction(getParameter("content"));
-		
-		content.add(jp);
+		frame.getContentPane().add(jp);
+		frame.pack();
+		frame.setVisible(true);
+	
 		
 	}
 
 	public JPanel startFunction(String s){   
 		//Util.g = Util.readGraphFromFile(s);
 		Util.stepX=50; Util.stepY=50;
-		Util.xlines=30;Util.ylines=30;
+		Util.xlines=50;Util.ylines=30;
 		Util.g = Util.readGraphFromContent(s);
 	
 		Layout<Vertex,Edge> frl=new FRLayout<Vertex,Edge>(Util.g);
@@ -197,8 +196,8 @@ public class DsrDraw extends JApplet implements ActionListener{
 
 	
 		vsta=new VertexShapeSizeAspect<Vertex>();
-		snapToGridLayout=new SnapToGridStaticLayout(Util.g);//,Util.vv.getGraphLayout());
-		nosnapToGridLayout=new NoSnapToGridStaticLayout(Util.g);//,Util.vv.getGraphLayout());
+		snapToGridLayout=new SnapToGridStaticLayout(Util.g);
+		nosnapToGridLayout=new NoSnapToGridStaticLayout(Util.g);
 		cubicTransf=new CubicCurveTransformer(Util.vv);
 		quadTransf=new QuadCurveTransformer(Util.vv);
 		 Util.vv.getRenderer().setVertexRenderer(
@@ -265,10 +264,8 @@ public class DsrDraw extends JApplet implements ActionListener{
 	{
 		final JPanel control_panel = new JPanel();
 		jp.add(control_panel, BorderLayout.NORTH);
-		//control_panel.setBackground(Color.DARK_GRAY);
-		control_panel.setLayout(new BoxLayout(control_panel, BoxLayout.LINE_AXIS));   //differnt
-		//final Box vertex_panel = Box.createHorizontalBox();
-		//vertex_panel.setBorder(BorderFactory.createTitledBorder("Weight"));
+
+		control_panel.setLayout(new BoxLayout(control_panel, BoxLayout.LINE_AXIS));   
 		JPanel shape_panel = new JPanel();
 		shape_panel.setLayout(new BoxLayout(shape_panel, BoxLayout.LINE_AXIS));
 		shape_panel.setBorder(BorderFactory.createTitledBorder("Edge shape"));
@@ -285,19 +282,14 @@ public class DsrDraw extends JApplet implements ActionListener{
 		intro.setForeground(new Color(49,101,223));
 		intro.setFont(new Font("Bookman", Font.BOLD,18));
 		control_panel.add(intro);
-		//control_panel.add(new JSeparator(SwingConstants.VERTICAL));
-		//control_panel.add(new JSeparator(SwingConstants.VERTICAL));
 				
 		
-	
-		control_panel.add(shape_panel);
+		control_panel.add(Box.createRigidArea(new Dimension(35,0)));
+		control_panel.add(shape_panel);control_panel.add(Box.createRigidArea(new Dimension(10,0)));
 		control_panel.add(zoomPanel);
-		control_panel.add(gridPanel);
+		
 	
-
-		// set up edge controls
-
-		e_line = new JRadioButton("line");
+        e_line = new JRadioButton("line");
 		e_line.addActionListener(this);
 		e_line.setSelected(true);
 		e_quad = new JRadioButton("quad");
@@ -310,9 +302,9 @@ public class DsrDraw extends JApplet implements ActionListener{
 		bg_shape.add(e_quad);
 		bg_shape.add(e_cubic);
 	
-		shape_panel.add(e_line);
-		shape_panel.add(e_quad);
-		shape_panel.add(e_cubic);
+		shape_panel.add(e_line);//shape_panel.add(new JLabel(lineI));
+		shape_panel.add(e_quad);//shape_panel.add(new JLabel(oneI));
+		shape_panel.add(e_cubic);//shape_panel.add(new JLabel(twoI));
 		shape_panel.setOpaque(true);
 		
 
@@ -337,10 +329,9 @@ public class DsrDraw extends JApplet implements ActionListener{
 
 		zoomPanel.add(plus);
 		zoomPanel.add(minus);
-		//zoomPanel.add(zoom_at_mouse);
-
+	
 		//Grid buttons
-		set_grid = new JCheckBox("<html><center>Show grid</center></html>");
+		set_grid = new JCheckBox("Show grid");
 		set_grid.addActionListener(this);
 		set_grid.setSelected(false);
 
@@ -368,40 +359,34 @@ public class DsrDraw extends JApplet implements ActionListener{
 		gridPanel.add(plus_grid);
 		gridPanel.add(minus_grid);
 		gridPanel.add(set_grid);
-		snap_to_grid = new JCheckBox("<html><center>Snap to grid</center></html>");
+		snap_to_grid = new JCheckBox("Snap to grid");
 		snap_to_grid.addActionListener(this);
 		snap_to_grid.setSelected(false);
 		gridPanel.add(snap_to_grid);
-
+		control_panel.add(Box.createRigidArea(new Dimension(10,0)));
+		control_panel.add(gridPanel);   
 
         final DefaultModalGraphMouse<Integer,Number> graphMouse = new DefaultModalGraphMouse<Integer,Number>();
         Util.vv.setGraphMouse(graphMouse);
         graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
         
-        //TODO: verifica ce e cu girdul care se deplaseaza si el
-        //p.lock(true) - poate e o solutie
-        //TODO: transofrmarile din 1-0 in LAYOUT, view 
-        //care e legatura cu render-ul
-        //cand fac transformarea de translatre , ulterior punctele nu se mai afiseaza bine
-        //desi se porneste de la 0 1 corect, tranformarea in coordonate ecran nu merge
-        
-        JPanel modePanel = new JPanel(new GridLayout(1,1));
-   //     modePanel.setBorder(BorderFactory.createTitledBorder("Mouse Mode"));
-       // modePanel.add(graphMouse.getModeComboBox());
-        control_panel.add(modePanel);
-		//modePanel.add(Util.modeBox);
+      
+      
+	
 		coordB=new JButton("ExportToLatex");
 		coordB.addActionListener(this);
-	    hideLatex=new JButton("HideLatex");
-	    hideLatex.addActionListener(this);
+	 //   hideLatex=new JButton("HideLatex");
+	 //   hideLatex.addActionListener(this);
+		control_panel.add(Box.createRigidArea(new Dimension(20,0)));
 		control_panel.add(coordB);
-		control_panel.add(hideLatex);
-		latex = new JTextArea(5, 30);
-		scrollPane = new JScrollPane(latex);
-		latex.setLineWrap(true);
+		control_panel.add(Box.createHorizontalGlue());
+	//	control_panel.add(hideLatex);
+	//	latex = new JTextArea(5, 30);
+	//scrollPane = new JScrollPane(latex);
+	//	latex.setLineWrap(true);
 		
-		latex.setEditable(true);
-		 jp.add(scrollPane, BorderLayout.EAST);
+		//latex.setEditable(true);
+		 //jp.add(scrollPane, BorderLayout.EAST);
 
 	}
 
@@ -418,7 +403,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 		else
 			if (source ==snap_to_grid)
 			{	if (source.isSelected())
-				// if (!startEditing)//snap to grid
+				
 			{startEditing=true;
 			Util.vv.setGraphLayout(new SnapToGridStaticLayout(Util.g));
 			}
@@ -487,21 +472,16 @@ public class DsrDraw extends JApplet implements ActionListener{
 						}
 						
 					} 
-					else if (source == gradient_relative) {
-						if (source.isSelected()) {
-							gradient_level = GRADIENT_RELATIVE;
-						}
-					}
 					else
 						if(source==coordB)
 							{String lt=Util.exportToLatex();
-							latex.setText(lt);
-							final ClipboardService cs;
+						//	latex.setText(lt);
+						//	final ClipboardService cs;
 							final FileSaveService fos;
 					    try{
-							cs = (ClipboardService)ServiceManager.lookup("javax.jnlp.ClipboardService");
-							if(cs!=null)
-						    	 cs.setContents(new StringSelection(lt));
+						//	cs = (ClipboardService)ServiceManager.lookup("javax.jnlp.ClipboardService");
+						//	if(cs!=null)
+						//    	 cs.setContents(new StringSelection(lt));
 							FileContents fc ;
 							fos = (FileSaveService)ServiceManager.lookup("javax.jnlp.FileSaveService");
 							if(fos!=null)
@@ -519,7 +499,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 						    
 							}
 		
-					else
+					/*else
                        if(source==hideLatex)
                     	   if(hideLatex.getText().equals("HideLatex"))
                     			   {hideLatex.setText("ShowLatex");
@@ -528,7 +508,7 @@ public class DsrDraw extends JApplet implements ActionListener{
                     	   else
                     	   {hideLatex.setText("HideLatex");
            	                scrollPane.setVisible(true);
-           	            }
+           	            }*/
 		Util.vv.repaint();
 	}
 
@@ -540,7 +520,7 @@ public class DsrDraw extends JApplet implements ActionListener{
 				public Integer transform(V v) {
 					if (v instanceof ControlPoint){
 						Edge e=((ControlPoint) v).getEdge();
-						//if ((e!=null)&&(!(e.isLine))&&(Util.vv.getPickedEdgeState().getPicked().contains(e)))
+					
 						if ((e!=null)&&(Util.vv.getPickedEdgeState().getPicked().contains(e)))
 							if ((e.lineType.equals(Util.LineType.cubicType)&& (((ControlPoint) v).index<3)))
 							  return 10;
@@ -565,14 +545,16 @@ public class DsrDraw extends JApplet implements ActionListener{
 	
 
 	class ControlPickableVertexPaintTransformer extends PickableVertexPaintTransformer<Vertex>{
-		//change position of control points - applies only to these points
-		//according to control point position, the edge's shape is changed
+		/*
+		* It applies only to control points. It changes the position of these control points and 
+		* the edge's shape is changed according to the new position of its control points. 
+		*/
 		public ControlPickableVertexPaintTransformer(PickedInfo<Vertex> pi, Paint fill_paint, Paint picked_paint){
 			super(pi, fill_paint, picked_paint);
 		}
 
 		public Point2D scaledCoordinates(Edge e, Point2D p){
-			//get the point p in scaled coordinates relative to the edge e
+			//gets the point p in scaled coordinates relative to the edge e
 			Layout<Vertex,Edge> layout = Util.vv.getModel().getGraphLayout();
 			
 			Pair<Vertex> endpoints=Util.g.getEndpoints(e);
@@ -629,13 +611,15 @@ public class DsrDraw extends JApplet implements ActionListener{
 	
 	 
 	class SnapToGridStaticLayout extends ObservableCachingLayout<Vertex, Edge>  {
-		//most probable this should be added to some pluggable transformer, based on events
-		//compute it only if chagefired on that node
+		/*
+		 * Optimizes the computation for updating the nodes when SnapToGrid option is on 
+		 */
 		public SnapToGridStaticLayout(Graph<Vertex, Edge> g){
 			super(new StaticLayout<Vertex,Edge>(g, Util.vv.getGraphLayout()));
 		//	addChangeListener(this);
 		}
-		/*public void stateChanged(ChangeEvent e)
+		/* Applies only when the state is changed
+		 * public void stateChanged(ChangeEvent e)
 		{ if (e.getSource() instanceof Vertex)
 		{	Vertex v=(Vertex)e.getSource();
 		    if (!(v instanceof ControlPoint))

@@ -1,0 +1,24 @@
+first matrix
+RA = -1 edge from  R to A with -
+   =1        from  R to  A with +
+   =0 nothing
+   
+AR = -1 edge from A to R with -
+   = +1 edge from A to R with +
+   =+,-  
+    if RA=0
+         edge from  A to R with +inf
+         edge from  A to R with -inf
+    if RA <>0
+          edge from A to R with +  
+          edge from A to R with -  
+              
+             
+ a-->2a.
+ ra = 1   arc ra +
+ ar = -   arc ar -
+ 
+ a-->b
+ ra=-1  rb=1  edge ra - edge rb+ 
+ ar=-             ar -           => edge ar-  undirected
+                                    ar rb +

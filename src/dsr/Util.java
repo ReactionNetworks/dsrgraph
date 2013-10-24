@@ -171,14 +171,8 @@ public class Util {
 
 	public static List<Map<String, Short>> computeMatrix(String[][] species,
 			int type) {
-		Map<String, Short> matrix1 = new HashMap<String, Short>(); // from
-																	// reaction
-																	// to
-																	// species
-		Map<String, Short> matrix2 = new HashMap<String, Short>(); // from
-																	// reaction
-																	// to
-																	// species
+		Map<String, Short> matrix1 = new HashMap<String, Short>(); 
+		Map<String, Short> matrix2 = new HashMap<String, Short>(); 
 		List<Map<String, Short>> spCard = new ArrayList<Map<String, Short>>();
 	
 		for (int i = 0; i < 2; i++)// left/right part of reaction
@@ -186,9 +180,7 @@ public class Util {
 			Map<String, Short> part = new HashMap<String, Short>();
 			for (int k = 0; k < species[i].length; k++) //
 			{
-				String csp = species[i][k].trim();// check if there is only a
-													// species name or also a
-													// parameter
+				String csp = species[i][k].trim();// check if there is only a name or also a number
 				short coef = 1;
 				if (csp.matches("[0-9]+[a-zA-Z]+.*")) {
 					String pp[] = csp.split("[a-zA-Z]");
@@ -232,16 +224,16 @@ public class Util {
 			switch (v) {
 			case 0:
 				matrix2.put(s, (short) 2);
-				break;// nothing
+				break;
 			case 1:
 				matrix2.put(s, (short) -1);
-				break; // nothing
+				break; 
 			case 2:
 				matrix2.put(s, (short) 1);
-				break; // nothing
+				break; 
 			case 3:
 				matrix2.put(s, (short) 0);
-				break; // nothing
+				break; 
 			}
 		}
 		
@@ -253,7 +245,7 @@ public class Util {
 	}
 
 	static public Point2D affineTransform(Edge edge, Point2D p) {
-		//from scaled relative to endpoints to render
+		
 		Layout<Vertex, Edge> layout = Util.vv.getModel().getGraphLayout();
 
 		Pair<Vertex> endpoints = Util.g.getEndpoints(edge);

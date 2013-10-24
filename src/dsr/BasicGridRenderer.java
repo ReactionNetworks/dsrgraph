@@ -12,7 +12,7 @@ import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.renderers.BasicRenderer;
 import edu.uci.ics.jung.visualization.transform.shape.GraphicsDecorator;
-//TODO add listener to the change of grid parameters
+
 public class BasicGridRenderer<V,E> extends BasicRenderer<V,E> implements ChangeListener {
 
     VisualizationViewer<V,E> vv;
@@ -35,7 +35,7 @@ public class BasicGridRenderer<V,E> extends BasicRenderer<V,E> implements Change
 		g2d.setColor(Color.LIGHT_GRAY);
 		g2d.setStroke(RenderContext.DOTTED);
 		Point2D p1,p2;
-		//Point2D lvc = rc.getMultiLayerTransformer().inverseTransform(vv.getCenter());
+	
 		p1=new Point2D.Double();
 		p2=new Point2D.Double();
 		int my=Util.stepY*Util.ylines;

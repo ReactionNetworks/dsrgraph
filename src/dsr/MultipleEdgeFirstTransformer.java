@@ -25,13 +25,13 @@ public class MultipleEdgeFirstTransformer extends QuadCurveTransformer
 {   VisualizationViewer<Vertex,Edge> v;
     EdgeShape.Line<Vertex,Edge> cct;
 
-    //protected EdgeIndexFunction<Vertex,Edge> parallelEdgeIndexFunction;
+   
     
     //VisualizationViewer<Vertex,Edge> v
 public MultipleEdgeFirstTransformer(){
 	super();
 	cct=new EdgeShape.Line<Vertex,Edge>();
-    	//this.v=v;
+    	
 }
 
 

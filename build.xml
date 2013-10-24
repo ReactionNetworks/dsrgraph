@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="Dsr">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="Dsr.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/jung-algorithms-2.0.1.jar"/>
+        <pathelement location="lib/jung-api-2.0.1.jar"/>
+        <pathelement location="lib/jung-graph-impl-2.0.1.jar"/>
+        <pathelement location="lib/jung-visualization-2.0.1.jar"/>
+        <pathelement location="lib/collections-generic-4.01.jar"/>
+        <!--pathelement location="../../../../usr/jdk1.6.0_32/jre/lib/javaws.jar"/-->
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="Dsr.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="DsrDraw">
+        <java classname="dsr.DsrDraw" failonerror="true" fork="yes">
+            <arg line="&quot;a&lt;--&gt;a.a+2bc23&lt;--3c.&quot;"/>
+            <classpath refid="Dsr.classpath"/>
+        </java>
+    </target>
+    <target name="dist" depends="build">
+       <jar basedir="bin" destfile="dsr.1.5.jar"/>
+       <!--copy todir="bin">
+           <fileset dir="${resources.dir}"/>
+       </copy-->
+     </target>
+    
+</project>

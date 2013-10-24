@@ -35,10 +35,9 @@ public class Edge {
    public Edge(short value, int id, boolean multiple){
 	   this.sgn=(byte)((value>0) ? 1 : -1);
 	   this.lbl=(short) (sgn*value);
-	   //this.lbl=value;
 	   orientation=1;this.id=id;
 	   this.isMultiple=multiple;
-	   //Point2D ctrl3=new Point2D.Double(-0.5, 40f); //it is not the first edge between two vertices
+	  
 	     
 	   
    }
@@ -60,7 +59,7 @@ public class Edge {
 			       return ""+lbl;
 		   else
 			   return "{}";
-			 //   return (Util.allOne)? "":""+lbl ;
+			
 		  
 	   if (lbl!=1)
 		   if (lbl==100)
