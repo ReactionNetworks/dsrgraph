@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--jnlp spec="1.0+" codebase="http://127.0.0.1/~casianpantea/control/" href=""-->
+<jnlp spec="1.0+" codebase="file:///home/anca/workspace3/Dsr/" href="">
+    <information>
+        <title>DSR Graph</title>
+        <vendor>reaction-networks.net</vendor>
+    </information>
+    <resources>
+        <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="dsr.1.5.jar" main="true"/> 
+        <jar href="lib/jung-algorithms-2.0.1.jar" main="false"/>
+        <jar href="lib/jung-api-2.0.1.jar" main="false"/>
+        <jar href="lib/jung-graph-impl-2.0.1.jar" main="false" />
+        <jar href="lib/jung-visualization-2.0.1.jar" main="false" />
+    </resources>
+    <application-desc
+      name="DSR Graph"
+      main-class="dsr.DsrDraw"
+      width="800"
+      height="800">
+      <argument>a--n.a&lt;--&gt;e.</argument> 
+      </application-desc>
+  <update check="background"/>
+</jnlp>

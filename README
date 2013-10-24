@@ -1,0 +1,62 @@
+1. Compiling with ant 
+
+a. cd {folder with build.xml}
+
+b. Check the paths for libraries inside the file build.xml. By default, the jung libraries are placed in the lib folder; if you use another folder, change the corresponding paths in build.xml.
+Obs: In some cases, also the path for javaws.jar from your installed jre or jdk is necessary. Uncomment the corresponding line in build.xml and put its path.
+
+c. In the same folder with build.xml run
+     ant     
+       or
+     ant -f build.xml
+It will compile all the classes in src folder and put the results in bin folder.
+
+If you want to clean previously compiled classes, you can use
+    ant clean
+
+d. If you want to create the jar file, run
+    ant dist
+ It will create a jar file containing all the classes, without the necessary libraries.
+
+
+2. Running 
+
+a. In order to run as a standalone application, do the steps a,b,c from compiling phase and after that run
+   ant DsrDraw
+from the same folder with build.xml
+   
+Obs1: In the standalone way, the export to Latex functionality will not work.
+Obs2. The input reactions are mentioned inside the file build.xml in the target DsrDraw in the arg element
+
+  <arg line="&quot;a&lt;--&gt;b.a+2bc23&lt;--3c.&quot;" /> 
+        means a<-->b and a + 2bc23 <-- 3c
+
+The input format for reactions:  
+ - Each reaction is followed by the sign . (dot)
+ - The direction of the reaction is mentioned by the signs less and greater, that are mentioned with &lt; , respectively &gt;
+ - Use &quot; at the beginning of the reactions and in the end.
+
+ 
+b. Run with javaws - with complete functionality. 
+
+cd {folder of build xml}
+ant dist
+
+and 
+  i.  update the path inside dsr1.jnlp
+  ii. run    javaws dst1.jnlp
+
+Obs: The reactions can be added inside the file dsr1.jnlp in the argument element. The format is the same as described above, except for the last point (&quot is not needed).
+
+3. When running with Eclipse IDE 
+- create a Java project from an Existing project indicating the folder Dsr
+or
+-  create a new Java Project
+-  import the java classes from the src folder
+-  from the properties of the project, change the BuildPath by adding the libraries from jung:
+     jung-algorithms-2.0.1.jar
+     jung-api-2.0.1.jar
+     jung-graph-impl-2.0.1.jar
+     jung-visualization-2.0.1.jar
+- build the project (by default, Eclipse builds it automatically
+- create a RunConfiguration with main class DsrDraw and arguments the reactions
