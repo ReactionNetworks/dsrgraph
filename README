@@ -1,3 +1,10 @@
+**** IMPORTANT ****
+
+JNLP is no longer widely supported or user friendly, due to restrictive permissions. As such, this project is deprecated and will not receive any further development. We hope to replace this library with one written in JavaScript, but are limited by lack of programming time and resources. If you are interested in helping out, please contact us.
+
+
+
+
 1. Compiling with ant 
 
 a. cd {folder with build.xml}
